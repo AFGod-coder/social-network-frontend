@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, switchMap, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap, map } from 'rxjs/operators';
 import { Post, CreatePostRequest, Like, CreateLikeRequest } from '../models/post.model';
 import { AuthService } from './auth.service';
 import { ErrorHandlerService } from './error-handler.service';
@@ -32,9 +33,18 @@ export class PostService {
   }
 
   getFeed(userId: number): Observable<Post[]> {
+    console.log('🚀 PostService.getFeed called with userId:', userId);
+    console.log('🚀 API_URL:', this.API_URL);
+    console.log('🚀 Headers:', this.getHeaders());
+    
     return this.http.get<Post[]>(`${this.API_URL}/feed?userId=${userId}`, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      catchError(error => {
+        console.error('❌ Error in getFeed:', error);
+        return this.errorHandler.handleError(error);
+      })
+    );
   }
 
   getPost(id: number): Observable<Post> {
@@ -65,6 +75,22 @@ export class PostService {
     });
   }
 
+  getUserLike(postId: number, userId: number): Observable<Like | null> {
+    console.log('🚀 PostService.getUserLike called with:', { postId, userId });
+    
+    return this.getLikes(postId).pipe(
+      map((likes: Like[]) => {
+        const userLike = likes.find((like: Like) => like.userId === userId);
+        console.log('🔍 User like found:', userLike);
+        return userLike || null;
+      }),
+      catchError(error => {
+        console.error('❌ Error in getUserLike:', error);
+        return this.errorHandler.handleError(error);
+      })
+    );
+  }
+
   getAllLikes(): Observable<Like[]> {
     // Since there's no endpoint for all likes, we'll return an empty array
     // In a real implementation, you might want to create this endpoint
@@ -75,18 +101,32 @@ export class PostService {
   }
 
   unlikePost(postId: number, userId: number): Observable<void> {
+    console.log('🚀 PostService.unlikePost called with:', { postId, userId });
+    
     // Primero obtener el like del usuario para ese post
     return this.getLikes(postId).pipe(
       switchMap(likes => {
         const userLike = likes.find(like => like.userId === userId);
         if (userLike) {
+          console.log('✅ Found user like, removing with likeId:', userLike.id);
           return this.removeLike(postId, userLike.id);
         } else {
+          console.log('❌ User like not found for post:', postId, 'user:', userId);
           return throwError(() => new Error('Like no encontrado'));
         }
       }),
-      catchError(error => this.errorHandler.handleError(error))
+      catchError(error => {
+        console.error('❌ Error in unlikePost:', error);
+        return this.errorHandler.handleError(error);
+      })
     );
+  }
+
+  // Método optimizado para unlike directo si ya tenemos el likeId
+  unlikePostDirect(postId: number, likeId: number): Observable<void> {
+    console.log('🚀 PostService.unlikePostDirect called with:', { postId, likeId });
+    
+    return this.removeLike(postId, likeId);
   }
 
   deletePost(postId: number): Observable<void> {
@@ -119,10 +159,17 @@ export class PostService {
   }
 
   removeLike(postId: number, likeId: number): Observable<void> {
+    console.log('🚀 PostService.removeLike called with:', { postId, likeId });
+    console.log('🚀 API_URL:', this.API_URL);
+    console.log('🚀 Headers:', this.getHeaders());
+    
     return this.http.delete<void>(`${this.API_URL}/posts/${postId}/likes/${likeId}`, {
       headers: this.getHeaders()
     }).pipe(
-      catchError(error => this.errorHandler.handleError(error))
+      catchError(error => {
+        console.error('❌ Error in removeLike:', error);
+        return this.errorHandler.handleError(error);
+      })
     );
   }
 }

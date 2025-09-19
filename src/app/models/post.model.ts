@@ -5,6 +5,7 @@ export interface Post {
   authorAlias: string;
   createdAt: string;
   likesCount: number;
+  hasUserLiked?: boolean; // ✅ Estado del usuario actual (opcional)
 }
 
 export interface CreatePostRequest {

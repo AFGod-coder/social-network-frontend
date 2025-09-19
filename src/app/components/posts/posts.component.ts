@@ -17,7 +17,7 @@ import { NotificationService } from '../../services/notification.service';
       <div class="posts-content">
         <div class="posts-header">
           <div class="header-left">
-            <h1>Publicaciones</h1>
+            <h1>Feed de Publicaciones</h1>
             <button class="nav-button" (click)="goToProfile()">
               <span class="nav-icon">👤</span>
               Mi Perfil
@@ -74,9 +74,10 @@ import { NotificationService } from '../../services/notification.service';
             </div>
           } @else if (posts().length === 0) {
             <div class="empty-state">
-              <div class="empty-icon">📝</div>
-              <h3>No hay publicaciones aún</h3>
-              <p>Sé el primero en compartir algo con la comunidad</p>
+              <div class="empty-icon">📱</div>
+              <h3>Tu feed está vacío</h3>
+              <p>No hay publicaciones de otros usuarios en este momento.</p>
+              <p>¡Sé el primero en crear una publicación o invita a más amigos!</p>
             </div>
           } @else {
             <div class="posts-list">
@@ -506,6 +507,8 @@ export class PostsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('🚀 PostsComponent - ngOnInit called');
+    
     // Suscribirse al currentUser observable para recibir actualizaciones
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
@@ -513,8 +516,12 @@ export class PostsComponent implements OnInit {
       
       // Solo cargar posts y likes si hay un usuario autenticado
       if (user) {
+        console.log('✅ User authenticated, loading posts and likes');
         this.loadPosts();
         this.loadAllLikes();
+      } else {
+        console.log('❌ No user authenticated, clearing posts');
+        this.posts.set([]);
       }
     });
   }
@@ -547,10 +554,15 @@ export class PostsComponent implements OnInit {
 
       this.postService.createPost(postData).subscribe({
         next: (newPost) => {
-          this.posts.update(posts => [newPost, ...posts]);
+          // ✅ No agregar el post del usuario actual al feed
+          // El feed debe mostrar solo posts de otros usuarios
+          console.log('✅ Post created successfully, but not adding to feed (user\'s own post)');
           this.createPostForm.reset();
           this.showCreatePost = false;
           this.isCreatingPost.set(false);
+          
+          // Opcional: Mostrar mensaje de éxito
+          this.notificationService.showSuccess('¡Publicación creada exitosamente!');
         },
         error: (error) => {
           console.error('Error creating post:', error);
@@ -570,18 +582,44 @@ export class PostsComponent implements OnInit {
   }
 
   loadPosts(): void {
+    if (!this.currentUser) {
+      console.log('❌ No current user, cannot load feed');
+      return;
+    }
+
     this.isLoadingPosts.set(true);
-    this.postService.getAllPosts().subscribe({
+    console.log('🔄 Loading feed for user:', this.currentUser.id);
+    console.log('🔄 Current user details:', this.currentUser);
+    
+    // ✅ Usar getFeed en lugar de getAllPosts para mostrar solo posts de otros usuarios
+    this.postService.getFeed(this.currentUser.id).subscribe({
       next: (posts) => {
+        console.log('✅ Feed loaded successfully:', posts.length, 'posts');
+        console.log('✅ Posts received:', posts);
         this.posts.set(posts);
-        this.loadUserLikes(); // Cargar estado de likes del usuario después de cargar posts
-        this.isLoadingPosts.set(false);
+        
+        // ✅ Optimización: Si el backend ya incluye hasUserLiked, no necesitamos cargar likes por separado
+        if (posts.length > 0 && posts[0].hasUserLiked !== undefined) {
+          // El backend ya incluye el estado de likes del usuario
+          console.log('✅ Backend includes hasUserLiked, skipping separate likes load');
+          this.isLoadingPosts.set(false);
+        } else {
+          // Fallback: cargar likes por separado si el backend no los incluye
+          console.log('⚠️ Backend does not include hasUserLiked, loading likes separately');
+          this.loadUserLikes();
+          this.isLoadingPosts.set(false);
+        }
       },
       error: (error) => {
-        console.error('Error loading posts:', error);
+        console.error('❌ Error loading feed:', error);
+        console.error('❌ Error details:', {
+          status: error?.status,
+          message: error?.message,
+          error: error?.error
+        });
         this.isLoadingPosts.set(false);
         
-        let errorMsg = 'Error al cargar las publicaciones';
+        let errorMsg = 'Error al cargar el feed de publicaciones';
         if (error?.error?.message) {
           errorMsg = error.error.message;
         } else if (error?.message) {
@@ -650,12 +688,22 @@ export class PostsComponent implements OnInit {
         next: () => {
           this.isLikingPost.set(false);
           this.notificationService.showSuccess('Like removido');
+          
+          // ✅ Optimización: Actualizar el post directamente
+          this.posts.update(posts => 
+            posts.map(post => 
+              post.id === postId 
+                ? { ...post, likesCount: Math.max(0, post.likesCount - 1), hasUserLiked: false }
+                : post
+            )
+          );
+          
+          // Actualizar estado local como fallback
           this.userLikes.update(likes => {
             const newLikes = new Map(likes);
             newLikes.set(postId, false);
             return newLikes;
           });
-          this.loadUserLikes(); // Recargar estado de likes del usuario
         },
         error: (error) => {
           this.isLikingPost.set(false);
@@ -670,13 +718,22 @@ export class PostsComponent implements OnInit {
         next: (newLike) => {
           this.isLikingPost.set(false);
           this.notificationService.showSuccess('¡Post liked!');
-          // Actualizar estado local inmediatamente
+          
+          // ✅ Optimización: Actualizar el post directamente en lugar de recargar todo
+          this.posts.update(posts => 
+            posts.map(post => 
+              post.id === postId 
+                ? { ...post, likesCount: post.likesCount + 1, hasUserLiked: true }
+                : post
+            )
+          );
+          
+          // Actualizar estado local como fallback
           this.userLikes.update(likes => {
             const newLikes = new Map(likes);
             newLikes.set(postId, true);
             return newLikes;
           });
-          this.loadUserLikes(); // Recargar estado de likes del usuario
         },
         error: (error) => {
           console.error('Error adding like:', error);
@@ -707,6 +764,13 @@ export class PostsComponent implements OnInit {
   }
 
   hasUserLiked(postId: number): boolean {
+    // ✅ Optimización: Primero verificar si el post ya tiene esta información
+    const post = this.posts().find(p => p.id === postId);
+    if (post && post.hasUserLiked !== undefined) {
+      return post.hasUserLiked;
+    }
+    
+    // Fallback: usar el estado local si el backend no incluye esta información
     return this.userLikes().get(postId) || false;
   }
 
