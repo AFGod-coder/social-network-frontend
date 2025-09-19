@@ -18,9 +18,6 @@ export class AuthInterceptor implements HttpInterceptor {
       token = localStorage.getItem('accessToken');
     }
     
-    console.log('🔐 AuthInterceptor - URL:', req.url);
-    console.log('🔐 AuthInterceptor - Token exists:', !!token);
-    console.log('🔐 AuthInterceptor - Token:', token ? token.substring(0, 20) + '...' : 'null');
     
     // Si hay token, agregarlo al header Authorization
     if (token) {
@@ -29,9 +26,6 @@ export class AuthInterceptor implements HttpInterceptor {
           Authorization: `Bearer ${token}`
         }
       });
-      console.log('🔐 AuthInterceptor - Added Authorization header');
-    } else {
-      console.log('🔐 AuthInterceptor - No token, proceeding without Authorization header');
     }
 
     return next.handle(req).pipe(

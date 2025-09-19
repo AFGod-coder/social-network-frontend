@@ -118,10 +118,8 @@ export class AuthService {
       .subscribe({
         next: (user) => {
           this.currentUserSubject.next(user);
-          console.log('Perfil de usuario cargado:', user);
         },
         error: (error) => {
-          console.error('Error cargando perfil de usuario:', error);
           // Solo hacer logout si es un error 401 (no autorizado)
           if (error.status === 401) {
             this.logout();

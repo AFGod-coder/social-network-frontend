@@ -132,49 +132,68 @@ import { NotificationService } from '../../services/notification.service';
   styles: [`
     .posts-container {
       min-height: 100vh;
-      background: #f5f7fa;
+      background: var(--bg-secondary);
+      position: relative;
+    }
+
+    .posts-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 0;
     }
 
     .posts-content {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 20px;
+      position: relative;
+      z-index: 1;
     }
 
     .posts-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 32px;
+      padding: 32px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeIn 0.6s ease-out;
     }
 
     .header-left {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 24px;
     }
 
     .nav-button {
-      background: #3498db;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
+      border-radius: 12px;
+      padding: 12px 20px;
       cursor: pointer;
       font-size: 0.9rem;
-      transition: all 0.3s ease;
+      font-weight: 600;
+      transition: var(--transition);
       display: flex;
       align-items: center;
       gap: 8px;
+      box-shadow: var(--shadow-md);
     }
 
     .nav-button:hover {
-      background: #2980b9;
       transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
 
     .nav-icon {
@@ -183,73 +202,106 @@ import { NotificationService } from '../../services/notification.service';
 
     .posts-header h1 {
       margin: 0;
-      color: #2c3e50;
-      font-size: 2rem;
-      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .create-post-btn {
-      background: #3498db;
+      background: linear-gradient(135deg, var(--success-color) 0%, var(--success-hover) 100%);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
+      padding: 16px 28px;
+      border-radius: 12px;
       font-size: 1rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition);
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .create-post-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .create-post-btn:hover::before {
+      left: 100%;
     }
 
     .create-post-btn:hover {
-      background: #2980b9;
       transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
 
     .create-post-section {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      margin-bottom: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideIn 0.4s ease-out;
     }
 
     .create-post-section h2 {
-      margin: 0 0 20px 0;
-      color: #2c3e50;
-      font-size: 1.5rem;
+      margin: 0 0 24px 0;
+      color: var(--text-primary);
+      font-size: 1.75rem;
+      font-weight: 700;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .form-group label {
       display: block;
       margin-bottom: 8px;
-      color: #34495e;
-      font-weight: 500;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
     }
 
     .form-group textarea {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e1e8ed;
-      border-radius: 8px;
+      padding: 16px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
       font-size: 1rem;
       font-family: inherit;
       resize: vertical;
-      transition: border-color 0.3s ease;
+      transition: var(--transition);
+      background: var(--bg-primary);
+      font-weight: 500;
+      min-height: 120px;
     }
 
     .form-group textarea:focus {
       outline: none;
-      border-color: #3498db;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      transform: translateY(-1px);
     }
 
     .error-message {
-      color: #e74c3c;
+      color: var(--danger-color);
       font-size: 0.875rem;
-      margin-top: 5px;
+      margin-top: 6px;
+      font-weight: 500;
     }
 
     .form-actions {
@@ -258,26 +310,45 @@ import { NotificationService } from '../../services/notification.service';
     }
 
     .submit-btn {
-      background: #27ae60;
+      background: linear-gradient(135deg, var(--success-color) 0%, var(--success-hover) 100%);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
+      padding: 16px 32px;
+      border-radius: 12px;
       font-size: 1rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition);
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .submit-btn:hover:not(:disabled)::before {
+      left: 100%;
     }
 
     .submit-btn:hover:not(:disabled) {
-      background: #229954;
       transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
 
     .submit-btn:disabled {
-      background: #bdc3c7;
+      background: var(--secondary-color);
       cursor: not-allowed;
       transform: none;
+      opacity: 0.6;
     }
 
     .loading {
@@ -287,31 +358,35 @@ import { NotificationService } from '../../services/notification.service';
     }
 
     .posts-section {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeIn 0.6s ease-out;
     }
 
     .posts-section h2 {
-      margin: 0 0 20px 0;
-      color: #2c3e50;
-      font-size: 1.5rem;
+      margin: 0 0 24px 0;
+      color: var(--text-primary);
+      font-size: 1.75rem;
+      font-weight: 700;
     }
 
     .loading-state {
       text-align: center;
-      padding: 40px;
+      padding: 60px;
     }
 
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--bg-tertiary);
+      border-top: 4px solid var(--primary-color);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      margin: 0 auto 24px;
     }
 
     @keyframes spin {
@@ -321,66 +396,89 @@ import { NotificationService } from '../../services/notification.service';
 
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: #7f8c8d;
+      padding: 80px 20px;
+      color: var(--text-secondary);
     }
 
     .empty-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
+      font-size: 5rem;
+      margin-bottom: 24px;
+      opacity: 0.7;
     }
 
     .empty-state h3 {
-      margin: 0 0 10px 0;
-      color: #34495e;
-      font-size: 1.5rem;
+      margin: 0 0 12px 0;
+      color: var(--text-primary);
+      font-size: 1.75rem;
+      font-weight: 600;
     }
 
     .empty-state p {
       margin: 0;
       font-size: 1.1rem;
+      line-height: 1.6;
     }
 
     .posts-list {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
 
     .post-card {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #e9ecef;
-      transition: all 0.3s ease;
+      background: var(--bg-primary);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .post-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+      opacity: 0;
+      transition: var(--transition);
     }
 
     .post-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .post-card:hover::before {
+      opacity: 1;
     }
 
     .post-header {
-      margin-bottom: 15px;
+      margin-bottom: 16px;
     }
 
     .post-author {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
 
     .author-avatar {
-      width: 40px;
-      height: 40px;
-      background: #3498db;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
       color: white;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow-md);
     }
 
     .author-info {
@@ -389,52 +487,76 @@ import { NotificationService } from '../../services/notification.service';
     }
 
     .author-name {
-      font-weight: 600;
-      color: #2c3e50;
-      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 1.1rem;
     }
 
     .post-date {
-      color: #7f8c8d;
+      color: var(--text-secondary);
       font-size: 0.875rem;
+      font-weight: 500;
     }
 
     .post-content {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .post-content p {
       margin: 0;
-      color: #34495e;
-      line-height: 1.6;
-      font-size: 1rem;
+      color: var(--text-primary);
+      line-height: 1.7;
+      font-size: 1.1rem;
+      font-weight: 500;
     }
 
     .post-actions {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
     }
 
     .like-button {
-      background: none;
-      border: 2px solid #e1e8ed;
-      border-radius: 20px;
-      padding: 8px 16px;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 24px;
+      padding: 12px 20px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition);
       display: flex;
       align-items: center;
       gap: 8px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .like-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .like-button:hover:not(:disabled)::before {
+      left: 100%;
     }
 
     .like-button:hover:not(:disabled) {
-      border-color: #e74c3c;
-      background: #fdf2f2;
+      border-color: var(--danger-color);
+      background: rgba(239, 68, 68, 0.05);
+      transform: translateY(-1px);
     }
 
     .like-button.liked {
-      border-color: #e74c3c;
-      background: #fdf2f2;
+      border-color: var(--danger-color);
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger-color);
     }
 
     .like-button:disabled {
@@ -443,39 +565,67 @@ import { NotificationService } from '../../services/notification.service';
     }
 
     .like-icon {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
     }
 
     .like-count {
-      font-weight: 500;
-      color: #2c3e50;
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
     .delete-button {
-      background: #e74c3c;
+      background: var(--danger-color);
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
+      border-radius: 12px;
+      padding: 12px 16px;
       cursor: pointer;
       font-size: 0.9rem;
-      transition: all 0.3s ease;
-      margin-left: 10px;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
     }
 
-    .delete-button:hover {
-      background: #c0392b;
+    .delete-button:hover:not(:disabled) {
+      background: var(--danger-hover);
       transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
 
     .delete-button:disabled {
-      background: #bdc3c7;
+      background: var(--secondary-color);
       cursor: not-allowed;
       transform: none;
     }
 
     .delete-icon {
       font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .posts-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+      
+      .header-left {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .posts-header h1 {
+        font-size: 2rem;
+      }
+      
+      .create-post-section,
+      .posts-section {
+        padding: 24px;
+      }
+      
+      .post-card {
+        padding: 20px;
+      }
     }
   `]
 })
@@ -507,20 +657,13 @@ export class PostsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('🚀 PostsComponent - ngOnInit called');
-    
-    // Suscribirse al currentUser observable para recibir actualizaciones
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
-      console.log('🔄 PostsComponent - currentUser updated:', user);
       
-      // Solo cargar posts y likes si hay un usuario autenticado
       if (user) {
-        console.log('✅ User authenticated, loading posts and likes');
         this.loadPosts();
         this.loadAllLikes();
       } else {
-        console.log('❌ No user authenticated, clearing posts');
         this.posts.set([]);
       }
     });
@@ -538,34 +681,22 @@ export class PostsComponent implements OnInit {
   }
 
   onCreatePost(): void {
-    console.log('🔍 onCreatePost called');
-    console.log('🔍 createPostForm.valid:', this.createPostForm.valid);
-    console.log('🔍 currentUser:', this.currentUser);
-    console.log('🔍 form value:', this.createPostForm.value);
-    
     if (this.createPostForm.valid && this.currentUser) {
-      console.log('✅ Proceeding with post creation');
       this.isCreatingPost.set(true);
       
       const postData: CreatePostRequest = {
-        authorId: this.currentUser.id, // Usar el ID del usuario actual
+        authorId: this.currentUser.id,
         message: this.createPostForm.get('message')?.value
       };
 
       this.postService.createPost(postData).subscribe({
         next: (newPost) => {
-          // ✅ No agregar el post del usuario actual al feed
-          // El feed debe mostrar solo posts de otros usuarios
-          console.log('✅ Post created successfully, but not adding to feed (user\'s own post)');
           this.createPostForm.reset();
           this.showCreatePost = false;
           this.isCreatingPost.set(false);
-          
-          // Opcional: Mostrar mensaje de éxito
           this.notificationService.showSuccess('¡Publicación creada exitosamente!');
         },
         error: (error) => {
-          console.error('Error creating post:', error);
           this.isCreatingPost.set(false);
           
           let errorMsg = 'Error al crear la publicación';
@@ -583,40 +714,23 @@ export class PostsComponent implements OnInit {
 
   loadPosts(): void {
     if (!this.currentUser) {
-      console.log('❌ No current user, cannot load feed');
       return;
     }
 
     this.isLoadingPosts.set(true);
-    console.log('🔄 Loading feed for user:', this.currentUser.id);
-    console.log('🔄 Current user details:', this.currentUser);
     
-    // ✅ Usar getFeed en lugar de getAllPosts para mostrar solo posts de otros usuarios
     this.postService.getFeed(this.currentUser.id).subscribe({
       next: (posts) => {
-        console.log('✅ Feed loaded successfully:', posts.length, 'posts');
-        console.log('✅ Posts received:', posts);
         this.posts.set(posts);
         
-        // ✅ Optimización: Si el backend ya incluye hasUserLiked, no necesitamos cargar likes por separado
         if (posts.length > 0 && posts[0].hasUserLiked !== undefined) {
-          // El backend ya incluye el estado de likes del usuario
-          console.log('✅ Backend includes hasUserLiked, skipping separate likes load');
           this.isLoadingPosts.set(false);
         } else {
-          // Fallback: cargar likes por separado si el backend no los incluye
-          console.log('⚠️ Backend does not include hasUserLiked, loading likes separately');
           this.loadUserLikes();
           this.isLoadingPosts.set(false);
         }
       },
       error: (error) => {
-        console.error('❌ Error loading feed:', error);
-        console.error('❌ Error details:', {
-          status: error?.status,
-          message: error?.message,
-          error: error?.error
-        });
         this.isLoadingPosts.set(false);
         
         let errorMsg = 'Error al cargar el feed de publicaciones';
@@ -670,16 +784,10 @@ export class PostsComponent implements OnInit {
   }
 
   toggleLike(postId: number): void {
-    console.log('🔍 toggleLike called for postId:', postId);
-    console.log('🔍 currentUser:', this.currentUser);
-    console.log('🔍 isLikingPost:', this.isLikingPost());
-    
     if (!this.currentUser || this.isLikingPost()) {
-      console.log('❌ Early return: no user or already liking');
       return;
     }
 
-    console.log('✅ Proceeding with like/unlike');
     this.isLikingPost.set(true);
     
     if (this.hasUserLiked(postId)) {
@@ -689,7 +797,6 @@ export class PostsComponent implements OnInit {
           this.isLikingPost.set(false);
           this.notificationService.showSuccess('Like removido');
           
-          // ✅ Optimización: Actualizar el post directamente
           this.posts.update(posts => 
             posts.map(post => 
               post.id === postId 
@@ -697,8 +804,6 @@ export class PostsComponent implements OnInit {
                 : post
             )
           );
-          
-          // Actualizar estado local como fallback
           this.userLikes.update(likes => {
             const newLikes = new Map(likes);
             newLikes.set(postId, false);
@@ -708,7 +813,6 @@ export class PostsComponent implements OnInit {
         error: (error) => {
           this.isLikingPost.set(false);
           this.notificationService.showError('Error al quitar like');
-          console.error('Error unliking post:', error);
         }
       });
     } else {
